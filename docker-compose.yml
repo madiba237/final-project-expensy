@@ -1,0 +1,93 @@
+
+services:
+  # ---------------------------------------------------
+  # 1. BASE DE DONNÉES : MongoDB
+  # ---------------------------------------------------
+  mongo:
+    image: mongo:7.0
+    container_name: expensy-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-example}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - expensy-network
+
+  # ---------------------------------------------------
+  # 2. CACHE & SESSIONS : Redis
+  # ---------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: expensy-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-someredispassword}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - expensy-network
+
+  # ---------------------------------------------------
+  # 3. BACKEND : API Node.js / Express
+  # ---------------------------------------------------
+  backend:
+    build:
+      context: ./expensy_backend
+      dockerfile: Dockerfile
+    container_name: expensy-backend
+    restart: always
+    ports:
+      - "${PORT:-8706}:${PORT:-8706}"
+    environment:
+      PORT: ${PORT:-8706}
+      DATABASE_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-example}@mongo:27017/expensy?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-someredispassword}
+      NODE_ENV: production
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - expensy-network
+
+  # ---------------------------------------------------
+  # 4. FRONTEND : Application Next.js
+  # ---------------------------------------------------
+  frontend:
+    build:
+      context: ./expensy_frontend
+      dockerfile: Dockerfile
+      args:
+        # Variables injectées au moment du build Next.js
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8706}
+    container_name: expensy_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+    depends_on:
+      - backend
+    networks:
+      - expensy-network
+
+# ---------------------------------------------------
+# VOLUMES PERSISTANTS (Données préservées lors des redémarrages)
+# ---------------------------------------------------
+volumes:
+  mongo-data:
+  redis-data:
+
+# ---------------------------------------------------
+# RÉSEAU DOCKER DÉDIÉ (Communication interne inter-conteneurs)
+# ---------------------------------------------------
+networks:
+  expensy-network:
+    driver: bridge
