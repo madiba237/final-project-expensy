@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expensy-backend
+  namespace: default
+  labels:
+    app: expensy-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: expensy-backend
+  template:
+    metadata:
+      labels:
+        app: expensy-backend
+    spec:
+      imagePullSecrets:
+        - name: drs
+      serviceAccountName: expensy-sa # Permet au Backend d'interagir avec DynamoDB via IRSA si besoin
+      containers:
+        - name: backend
+          image: mulema/expensy-backend:latest  # Remplace par ton image Docker
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+            - name: REDIS_HOST
+              value: "expensy-redis-endpoint-address" # Mettre l'output Terraform `redis_endpoint`
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MONGO_URI
+              value: "mongodb://your-mongo-uri:27017/expensy" # Mettre l'URI DocumentDB / Atlas / EC2
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expensy-backend-service
+  namespace: default
+spec:
+  type: ClusterIP # DNS Interne : expensy-backend-service.default.svc.cluster.local
+  selector:
+    app: expensy-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP

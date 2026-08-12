@@ -2,9 +2,8 @@ locals {
   cluster_name = "eks-${var.student_name}"
 }
 
-# --- Network ---
-# Note: every student's VPC uses the same CIDR (10.0.0.0/16). That's fine —
-# separate VPCs are fully isolated, so identical ranges never conflict.
+# --- VPC + EKS cluster + worker nodes ---
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"

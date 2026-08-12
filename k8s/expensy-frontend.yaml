@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expensy-frontend
+  namespace: default
+  labels:
+    app: expensy-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: expensy-frontend
+  template:
+    metadata:
+      labels:
+        app: expensy-frontend
+    spec:
+      imagePullSecrets:
+        - name: drs
+      containers:
+        - name: frontend
+          image: mulema/expensy-nextjs-frontend:latest 
+          ports:
+            - containerPort: 80
+          env:
+            # Variable d'environnement lue par le frontend pour joindre l'API backend interne
+            - name: BACKEND_URL
+              value: "http://expensy-backend-service:5000"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expensy-frontend-service
+  namespace: default
+  annotations:
+    # Tags optionnels pour forcer la création d'un Network Load Balancer (NLB) AWS moderne
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+spec:
+  type: LoadBalancer # Génère un Load Balancer AWS avec une URL DNS publique
+  selector:
+    app: expensy-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
