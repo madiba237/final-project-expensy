@@ -1,0 +1,7 @@
+# Ignorer le dossier d'initialisation Terraform (binaires, providers, modules)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+**/.terraform/
