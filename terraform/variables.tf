@@ -13,7 +13,7 @@ variable "region" {
 variable "k8s_version" {
   description = "Kubernetes version. Use one in EKS STANDARD support to avoid the 6x extended-support fee. Check: <https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html>"
   type        = string
-  default     = "1.33"
+  default     = "1.34"
 }
 
 # Node count knobs (used by Terraform; Option B changes these live)
