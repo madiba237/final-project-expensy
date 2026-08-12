@@ -1,30 +1,31 @@
-variable "docdb_password" {
-  description = "Mot de passe master pour DocumentDB (MongoDB)"
+variable "student_name" {
+  description = "Your name, lowercase, no spaces (keeps your resources unique)"
   type        = string
-  sensitive   = true
+  default     = "alain"
 }
 
-variable "redis_password" {
-  description = "Mot de passe d'authentification Redis (AUTH token)"
+variable "region" {
+  description = "AWS region"
   type        = string
-  sensitive   = true
+  default     = "us-east-1"
 }
 
-variable "aws_region" {
-  description = "Région AWS pour le déploiement"
+variable "k8s_version" {
+  description = "Kubernetes version. Use one in EKS STANDARD support to avoid the 6x extended-support fee. Check: <https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html>"
   type        = string
-  default     = "eu-east-1"
+  default     = "1.33"
 }
 
-variable "cluster_name" {
-  description = "Nom du cluster EKS"
-  type        = string
-  default     = "alain-expensy-eks-cluster"
+# Node count knobs (used by Terraform; Option B changes these live)
+variable "desired_nodes" {
+  type    = number
+  default = 2
 }
-
-variable "environment" {
-  description = "Environnement de déploiement (dev, staging, prod)"
-  type        = string
-  default     = "alain-dev"
+variable "min_nodes" {
+  type    = number
+  default = 1
 }
-
+variable "max_nodes" {
+  type    = number
+  default = 3
+}
