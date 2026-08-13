@@ -1,0 +1,14 @@
+# monitoring/fluentbit-values.yaml
+
+cloudWatchLogs:
+  enabled: true
+  region: us-east-1
+  logGroupName: /aws/containerinsights/eks-alain/application
+  autoCreateGroup: true
+
+serviceAccount:
+  create: true
+  name: aws-for-fluent-bit
+  # Remplacez avec l'ARN de votre rôle IAM configuré avec IRSA pour CloudWatch
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_ACCOUNT_ID:role/FluentBitCloudWatchRole

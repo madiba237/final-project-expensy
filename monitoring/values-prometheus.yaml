@@ -1,0 +1,26 @@
+# monitoring/values-prometheus.yaml
+
+grafana:
+  enabled: true
+  adminPassword: "AdminPassword123!" # À modifier selon vos besoins
+  service:
+    type: LoadBalancer # Permet d'accéder à Grafana directement via une URL AWS ELB
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: 'expensy-dashboards'
+          orgId: 1
+          folder: 'Expensy'
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/expensy
+  dashboardsConfigMaps:
+    expensy-dashboards: "expensy-grafana-dashboard"
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
