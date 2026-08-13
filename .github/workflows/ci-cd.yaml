@@ -11,7 +11,7 @@ env:
   BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expensy-backend
   FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expensy-frontend
   AWS_REGION: us-east-1
-  EKS_CLUSTER_NAME: expensy-eks-cluster
+  EKS_CLUSTER_NAME: eks-alain
 
 jobs:
   # ==========================================
