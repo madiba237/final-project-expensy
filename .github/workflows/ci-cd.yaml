@@ -31,8 +31,8 @@ jobs:
           node-version: 24
           cache: 'npm'
           cache-dependency-path: |
-            expensy_backend/package-lock.json
-            expensy_frontend/package-lock.json
+            ./expensy_backend/package-lock.json
+            ./expensy_frontend/package-lock.json
 
       # --- Backend ---
       - name: Install & Build Backend
