@@ -7,8 +7,7 @@ cloudWatchLogs:
   autoCreateGroup: true
 
 serviceAccount:
-  create: true
+  create: false # On passe à false car eksctl l'a déjà créé
   name: aws-for-fluent-bit
-  # Remplacez avec l'ARN de votre rôle IAM configuré avec IRSA pour CloudWatch
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_ACCOUNT_ID:role/FluentBitCloudWatchRole
