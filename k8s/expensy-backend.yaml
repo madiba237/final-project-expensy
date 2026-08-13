@@ -15,23 +15,28 @@ spec:
       labels:
         app: expensy-backend
     spec:
-      imagePullSecrets:
-        - name: drs
-      serviceAccountName: expensy-sa # Permet au Backend d'interagir avec DynamoDB via IRSA si besoin
+      serviceAccountName: expensy-sa # Permet au pod d'accéder à DynamoDB via l'IA
       containers:
         - name: backend
-          image: mulema/expensy-backend:latest  # Remplace par ton image Docker
+          image: mulema/expensy-backend:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 5000
+            - containerPort: 8706
           env:
             - name: PORT
-              value: "5000"
+              value: "8706"
+            # Config DynamoDB (AWS SDK)
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: DYNAMODB_TABLE_NAME
+              value: "expensy-expenses-alain"
+            - name: TABLE_NAME
+              value: "expensy-expenses-alain"
+            # Config Redis (AWS ElastiCache)
             - name: REDIS_HOST
-              value: "expensy-redis-endpoint-address" # Mettre l'output Terraform `redis_endpoint`
+              value: "alain-expensy-redis.dj3ys1.0001.use1.cache.amazonaws.com" 
             - name: REDIS_PORT
               value: "6379"
-            - name: MONGO_URI
-              value: "mongodb://your-mongo-uri:27017/expensy" # Mettre l'URI DocumentDB / Atlas / EC2
           resources:
             requests:
               cpu: "100m"
@@ -39,17 +44,3 @@ spec:
             limits:
               cpu: "250m"
               memory: "256Mi"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: expensy-backend-service
-  namespace: default
-spec:
-  type: ClusterIP # DNS Interne : expensy-backend-service.default.svc.cluster.local
-  selector:
-    app: expensy-backend
-  ports:
-    - port: 5000
-      targetPort: 5000
-      protocol: TCP

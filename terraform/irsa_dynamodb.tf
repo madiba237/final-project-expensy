@@ -52,23 +52,16 @@ module "expensy_dynamodb_irsa_role" {
 }
 
 # --- 3. Configuration du Provider Kubernetes ---
+# 1. Récupération du jeton d'authentification via le provider AWS
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+# 2. Configuration du provider Kubernetes avec le token dynamique
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args        = [
-      "eks",
-      "get-token",
-      "--cluster-name", module.eks.cluster_name
-    ]
-    # Passe explicitement les variables d'environnement si tu utilises un profil spécifique
-    env = {
-      AWS_PROFILE = "default" # Remplace par le nom de ton profil AWS si nécessaire
-    }
-  }
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
 # --- 4. Service Account Kubernetes avec l'annotation IRSA ---

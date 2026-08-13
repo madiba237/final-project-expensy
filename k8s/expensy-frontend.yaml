@@ -39,15 +39,12 @@ kind: Service
 metadata:
   name: expensy-frontend-service
   namespace: default
-  annotations:
-    # Tags optionnels pour forcer la création d'un Network Load Balancer (NLB) AWS moderne
-    service.beta.kubernetes.io/aws-load-balancer-type: "external"
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+ 
 spec:
-  type: LoadBalancer # Génère un Load Balancer AWS avec une URL DNS publique
+  type: ClusterIP # Génère un Load Balancer AWS avec une URL DNS publique
   selector:
     app: expensy-frontend
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 3000
       protocol: TCP

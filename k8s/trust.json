@@ -1,0 +1,20 @@
+cat <<EOF > trust.json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::686699774218:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/D44B5BCB33783BB2A4B6802E7899B7FE"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-east-1.amazonaws.com/id/D44B5BCB33783BB2A4B6802E7899B7FE:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller",
+          "oidc.eks.us-east-1.amazonaws.com/id/D44B5BCB33783BB2A4B6802E7899B7FE:aud": "sts.amazonaws.com"
+        }
+      }
+    }
+  ]
+}
+EOF
